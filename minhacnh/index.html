@@ -168,7 +168,7 @@
                 { id: 'biometria', title: 'Coleta Biométrica', status: 'pendente', date: '', notes: 'Coleta de foto, assinatura e digitais.', icon: 'M7.864 4.243A7.5 7.5 0 0119.5 10.5c0 2.92-.556 5.709-1.588 8.261a7.5 7.5 0 01-14.124 0c-1.032-2.552-1.588-5.34-1.588-8.261a7.5 7.5 0 013.75-6.486', cost: '' },
                 { id: 'examesMedicos', title: 'Exames de Aptidão Física e Mental', status: 'pendente', date: '', notes: 'Avaliação médica e psicológica.', icon: 'M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-9.75 0h9.75', cost: '' },
                 { id: 'exameTeorico', title: 'Exame Teórico', status: 'pendente', attempts: [], notes: 'Prova oficial do DETRAN.', icon: 'M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z' }, // Changed to attempts array
-                { id: 'divulgacaoPasseDePrimeira', title: 'Dica de Ouro: Passe de Primeira!', notes: 'Aprovado na teoria? Turbine sua preparação para o exame prático! Nosso treinamento exclusivo "Passe de Primeira" tem tudo o que você precisa para conquistar sua CNH sem medo.', url: 'https://autoescolaaline.com.br/curso/', buttonText: 'Conhecer o Treinamento', icon: 'M12 18v-5.25m0 0a6.01 6.01 0 001.5-.189m-1.5.189a6.01 6.01 0 01-1.5-.189m3.75 7.478a12.06 12.06 0 01-4.5 0m3.75 2.311a12.061 12.061 0 01-4.5 0m3.75 2.311a12.061 12.061 0 01-4.5 0m5.625-10.44a6 6 0 11-11.25 0 6 6 0 0111.25 0z'},
+                { id: 'divulgacaoPasseDePrimeira', title: 'Dica de Ouro: Passe de Primeira!', notes: 'Aprovado na teoria? Turbine sua preparação para o exame prático! Nosso treinamento exclusivo "Passe de Primeira" tem tudo o que você precisa para conquistar sua CNH sem medo.', url: 'https://habilita.autos/passedeprimeira/', buttonText: 'Conhecer o Treinamento', icon: 'M12 18v-5.25m0 0a6.01 6.01 0 001.5-.189m-1.5.189a6.01 6.01 0 01-1.5-.189m3.75 7.478a12.06 12.06 0 01-4.5 0m3.75 2.311a12.061 12.061 0 01-4.5 0m3.75 2.311a12.061 12.061 0 01-4.5 0m5.625-10.44a6 6 0 11-11.25 0 6 6 0 0111.25 0z'}, // Updated URL
                 { id: 'aulasPraticas', title: 'Aulas Práticas de Direção', status: 'pendente', date: '', notes: 'Etapa opcional, mas recomendada. Defina a carga horária com seu instrutor.', icon: 'M9 15.75l3-3m0 0l3 3m-3-3v11.25m-10.125-11.25h14.25c.621 0 1.125.504 1.125 1.125v12c0 .621-.504 1.125-1.125 1.125H5.625c-.621 0-1.125-.504-1.125-1.125v-12c0-.621.504-1.125 1.125-1.125z', cost: '' },
                 { id: 'examePratico', title: 'Exame de Direção Veicular', status: 'pendente', attempts: [], notes: 'Prova prática de baliza e percurso.', icon: 'M21 12a2.25 2.25 0 00-2.25-2.25H15a3 3 0 11-6 0H5.25A2.25 2.25 0 003 12m18 0v6a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 18v-6m18 0a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 9.75m18 0v-6a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 1.5v6m12 15a3 3 0 11-6 0 3 3 0 016 0z' }, // Changed to attempts array
                 { id: 'permissao', title: 'Emissão da Permissão para Dirigir (PPD)', status: 'pendente', date: '', notes: 'Parabéns! Válida por 1 ano.', icon: 'M15 9h3.75M15 12h3.75M15 15h3.75M4.5 19.5h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z', cost: '' },
@@ -225,6 +225,10 @@
                            if(stage.id !== 'exameTeorico' && stage.id !== 'examePratico' && stage.attempts) {
                                delete stage.attempts; // Clean up old data if structure changed
                            }
+                           // Ensure notes is always a string
+                            if (stage.notes === undefined || stage.notes === null) {
+                                stage.notes = '';
+                            }
                        });
                     } else {
                         stagesData = JSON.parse(JSON.stringify(initialStages));
@@ -241,6 +245,10 @@
                             if(stage.id !== 'exameTeorico' && stage.id !== 'examePratico' && stage.attempts) {
                                delete stage.attempts; // Clean up old local data
                            }
+                           // Ensure notes is always a string
+                           if (stage.notes === undefined || stage.notes === null) {
+                                stage.notes = '';
+                            }
                         });
                     } else {
                        stagesData = JSON.parse(JSON.stringify(initialStages));
@@ -262,6 +270,10 @@
                             if(stage.id !== 'exameTeorico' && stage.id !== 'examePratico' && stage.attempts) {
                                delete stage.attempts;
                            }
+                           // Ensure notes is always a string
+                           if (stage.notes === undefined || stage.notes === null) {
+                                stage.notes = '';
+                            }
                         });
                         await db.collection('userProgress').doc(currentUser.uid).set({ stages: localData });
                         localStorage.removeItem('cnhProgress');
@@ -389,7 +401,7 @@
                         
                         const optionsHtml = currentStatusOptions.map(opt => `<option value="${opt.value}" ${stage.status === opt.value ? 'selected' : ''}>${opt.text}</option>`).join('');
                         
-                        cardHTML = `<div class="${currentStatus.cardBg} rounded-lg shadow-md p-4 md:p-6 border ${currentStatus.border}"><h3 class="font-bold text-gray-800 text-lg mb-3">${stage.title}</h3><div class="space-y-4">${dateCostInputsHTML}<div><label for="status-${stage.id}" class="block text-sm font-semibold text-gray-600 mb-1">Status Geral</label><select id="status-${stage.id}" data-stage-id="${stage.id}" data-prop="status" class="autosave w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-logo-blue focus:border-logo-blue">${optionsHtml}</select></div>${attemptsHTML}<div><label for="notes-${stage.id}" class="block text-sm font-semibold text-gray-600 mb-1">Anotações</label><textarea id="notes-${stage.id}" data-stage-id="${stage.id}" data-prop="notes" rows="2" class="autosave w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-logo-blue focus:border-logo-blue" placeholder="Ex: Informações adicionais...">${stage.notes}</textarea></div></div></div>`;
+                        cardHTML = `<div class="${currentStatus.cardBg} rounded-lg shadow-md p-4 md:p-6 border ${currentStatus.border}"><h3 class="font-bold text-gray-800 text-lg mb-3">${stage.title}</h3><div class="space-y-4">${dateCostInputsHTML}<div><label for="status-${stage.id}" class="block text-sm font-semibold text-gray-600 mb-1">Status Geral</label><select id="status-${stage.id}" data-stage-id="${stage.id}" data-prop="status" class="autosave w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-logo-blue focus:border-logo-blue">${optionsHtml}</select></div>${attemptsHTML}<div><label for="notes-${stage.id}" class="block text-sm font-semibold text-gray-600 mb-1">Anotações</label><textarea id="notes-${stage.id}" data-stage-id="${stage.id}" data-prop="notes" rows="2" class="autosave w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-logo-blue focus:border-logo-blue" placeholder="Ex: Informações adicionais...">${stage.notes || ''}</textarea></div></div></div>`; // Ensure notes is not undefined
 
                         iconContainerHTML = `<div class="z-20 flex-shrink-0 flex items-center ${currentStatus.iconBg} shadow-lg w-10 h-10 rounded-full">${iconHTML}</div>`;
                         
@@ -448,16 +460,18 @@
                  const date = prompt("Digite a data da tentativa (AAAA-MM-DD):");
                  const cost = prompt("Digite o custo desta tentativa (apenas números):");
 
-                 if (date && cost && !isNaN(parseFloat(cost))) {
+                 if (date && /^\d{4}-\d{2}-\d{2}$/.test(date) && cost && !isNaN(parseFloat(cost))) { // Added date validation
                      // Ensure attempts array exists
                     if (!Array.isArray(stagesData[stageIndex].attempts)) {
                         stagesData[stageIndex].attempts = [];
                     }
                      stagesData[stageIndex].attempts.push({ date: date, cost: parseFloat(cost) });
+                     // Sort attempts by date, oldest first
+                     stagesData[stageIndex].attempts.sort((a,b) => new Date(a.date) - new Date(b.date));
                      debouncedSave();
                      renderTimeline(); // Re-render to show the new attempt
                  } else if (date || cost) {
-                     alert("Data ou custo inválido. Por favor, tente novamente.");
+                     alert("Data (formato AAAA-MM-DD) ou custo inválido. Por favor, tente novamente.");
                  }
             }
             
@@ -479,17 +493,39 @@
 
 
             shareBtn.addEventListener('click', async () => {
-                const shareData = { title: 'MINHA CNH', text: 'Estou acompanhando meu processo para tirar a CNH com o app MINHA CNH! Acompanhe o seu também.', url: window.location.href };
+                const shareData = { title: 'MINHA CNH', text: 'Estou acompanhando meu processo para tirar a CNH com o app MINHA CNH! Acompanhe o seu também.', url: 'https://habilita.autos/minhacnh' }; // Updated URL
                 try {
                     if (navigator.share) await navigator.share(shareData);
                     else {
-                        navigator.clipboard.writeText(shareData.url);
-                        showToast('Link copiado para a área de transferência!');
+                         // Fallback using document.execCommand for wider compatibility
+                        const tempInput = document.createElement('textarea');
+                        tempInput.value = shareData.url;
+                        document.body.appendChild(tempInput);
+                        tempInput.select();
+                        try {
+                           document.execCommand('copy');
+                           showToast('Link copiado para a área de transferência!');
+                        } catch (err) {
+                           console.error('Falha ao copiar link:', err);
+                           showToast('Erro ao copiar link.');
+                        }
+                        document.body.removeChild(tempInput);
                     }
                 } catch (err) {
                     console.error("Erro ao compartilhar: ", err);
-                    navigator.clipboard.writeText(shareData.url);
-                    showToast('Link copiado para a área de transferência!');
+                    // Fallback using document.execCommand for wider compatibility
+                    const tempInput = document.createElement('textarea');
+                    tempInput.value = shareData.url;
+                    document.body.appendChild(tempInput);
+                    tempInput.select();
+                    try {
+                       document.execCommand('copy');
+                       showToast('Link copiado para a área de transferência!');
+                    } catch (copyErr) {
+                       console.error('Falha ao copiar link (fallback):', copyErr);
+                       showToast('Erro ao copiar link.');
+                    }
+                    document.body.removeChild(tempInput);
                 }
             });
             
