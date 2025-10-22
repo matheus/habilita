@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MINHA CNH - Acompanhamento do Processo</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts (Poppins) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+        .text-logo-blue {
+            color: #1E6A9C;
+        }
+
+        /* Linha do tempo Estilo Estrada */
+        .timeline-road {
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 8px; /* Largura da estrada */
+            background-color: #6B7280; /* Cor do asfalto */
+            transform: translateX(-50%);
+            z-index: 1; /* Fica atrás dos itens */
+        }
+
+        .timeline-road::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 50%;
+            width: 2px;
+            transform: translateX(-50%);
+            background-image: repeating-linear-gradient(
+                #FBBF24, /* Cor da faixa */
+                #FBBF24 15px, /* Comprimento do traço */
+                transparent 15px,
+                transparent 30px /* Espaço entre os traços */
+            );
+        }
+        /* Estilo para lista de tentativas */
+        .attempt-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 4px 0;
+            border-bottom: 1px solid #e5e7eb; /* gray-200 */
+        }
+        .attempt-item:last-child {
+            border-bottom: none;
+        }
+    </style>
+</head>
+<body class="bg-white text-gray-800">
+
+    <!-- Main App Container -->
+    <div id="app-container" class="container mx-auto p-4 md:p-8 max-w-4xl">
+        
+        <!-- Login Banner (for logged-out users) -->
+        <div id="login-banner" class="hidden bg-blue-50 border-t-4 border-logo-blue rounded-b text-blue-900 px-4 py-3 shadow-md mb-8" role="alert">
+          <div class="flex flex-col sm:flex-row sm:items-center">
+            <div class="flex items-center">
+                <div class="py-1"><svg class="fill-current h-6 w-6 text-logo-blue mr-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M10 20a10 10 0 1 1 0-20 10 10 0 0 1 0 20zm-1-9V7a1 1 0 0 1 2 0v4h.5a1 1 0 0 1 0 2H9a1 1 0 0 1-1-1zm1-4a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/></svg></div>
+                <div class="text-left">
+                  <p class="font-bold">Salve seu progresso na nuvem!</p>
+                  <p class="text-sm">Entre com sua conta para acessar de qualquer dispositivo.</p>
+                </div>
+            </div>
+            <button id="login-btn" class="mt-3 sm:mt-0 sm:ml-auto flex-shrink-0 bg-blue-600 text-white font-bold py-2 px-4 rounded-lg shadow-md hover:bg-blue-700 transition-colors duration-300 flex items-center justify-center gap-2">
+                <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><defs><path id="a" d="M44.5 20H24v8.5h11.8C34.7 33.9 30.1 37 24 37c-7.2 0-13-5.8-13-13s5.8-13 13-13c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 4.1 29.6 2 24 2 11.8 2 2 11.8 2 24s9.8 22 22 22c11 0 21-8 21-22 0-1.3-.2-2.7-.5-4z"/></defs><clipPath id="b"><use xlink:href="#a" overflow="visible"/></clipPath><path clip-path="url(#b)" fill="#FBBC05" d="M0 37V11l17 13z"/><path clip-path="url(#b)" fill="#EA4335" d="M0 11l17 13 7-6.1L48 14V0H0z"/><path clip-path="url(#b)" fill="#34A853" d="M0 37l30-23 7.9 1L48 0v48H0z"/><path clip-path="url(#b)" fill="#4285F4" d="M48 48L17 24l-4-3 35-10z"/></svg>
+                <span>Entrar com Google</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- User Info (for logged-in users) -->
+        <div id="user-info" class="hidden justify-end items-center mb-6"></div>
+
+
+        <header class="text-center mb-12">
+            <!-- Logo -->
+            <div class="mb-4">
+                <img src="minhacnh.jpg" alt="Logo MINHA CNH" class="w-24 h-24 rounded-full mx-auto object-cover shadow-md">
+            </div>
+
+            <h1 class="text-5xl md:text-7xl font-black uppercase text-gray-800">
+                MINHA <span class="text-logo-blue">CNH</span>
+            </h1>
+            <p class="text-gray-600 mt-3">Acompanhe seu processo para tirar a habilitação, etapa por etapa!</p>
+            <div class="mt-6 flex flex-col md:flex-row justify-center items-center gap-4">
+                <div id="duration-counter" class="bg-blue-50 border border-logo-blue text-logo-blue font-bold text-lg py-3 px-6 rounded-lg shadow-md w-full md:w-auto"></div>
+                <div id="total-cost-counter" class="bg-emerald-50 border border-emerald-500 text-emerald-800 font-bold text-lg py-3 px-6 rounded-lg shadow-md w-full md:w-auto"></div>
+            </div>
+        </header>
+
+        <main id="timeline-container" class="relative pt-4">
+            <div class="timeline-road"></div>
+        </main>
+
+        <footer class="text-center mt-12">
+             <div class="flex flex-col md:flex-row justify-center items-center gap-4">
+                <button id="share-btn" class="bg-blue-600 text-white font-bold py-2 px-6 rounded-lg shadow-md hover:bg-blue-700 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M15 8a3 3 0 10-2.977-2.63l-4.94 2.47a3 3 0 100 4.319l4.94 2.47a3 3 0 10.895-1.789l-4.94-2.47a3.027 3.027 0 000-.74l4.94-2.47C13.456 7.68 14.19 8 15 8z" /></svg>
+                    <span>Compartilhar</span>
+                </button>
+            </div>
+            <p id="footer-save-info" class="text-xs text-gray-400 mt-4"></p>
+        </footer>
+    </div>
+
+    <div id="toast" class="fixed bottom-5 right-5 bg-emerald-500 text-white py-2 px-4 rounded-lg shadow-xl transition-transform transform translate-x-full duration-500"></div>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+
+    <script>
+        // ******************************************************
+        // COLE SUAS CONFIGURAÇÕES DO FIREBASE AQUI
+        // ******************************************************
+        const firebaseConfig = {
+            apiKey: "AIzaSyAu9mV6DtpClQnmkZFlSC8cr0HBtFgdmQY",
+            authDomain: "minhacnhapp.firebaseapp.com",
+            projectId: "minhacnhapp",
+            storageBucket: "minhacnhapp.appspot.com",
+            messagingSenderId: "828173291257",
+            appId: "1:828173291257:web:ad6e49d67c6ae18f35dc28",
+            measurementId: "G-4NRWDBZJZD"
+        };
+        // ******************************************************
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        const googleProvider = new firebase.auth.GoogleAuthProvider();
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const loginBanner = document.getElementById('login-banner');
+            const loginBtn = document.getElementById('login-btn');
+            const userInfo = document.getElementById('user-info');
+            const footerSaveInfo = document.getElementById('footer-save-info');
+            
+            const timelineContainer = document.getElementById('timeline-container');
+            const shareBtn = document.getElementById('share-btn');
+            const toast = document.getElementById('toast');
+            const durationCounter = document.getElementById('duration-counter');
+            const totalCostCounter = document.getElementById('total-cost-counter');
+
+            let currentUser = null;
+            let stagesData = [];
+            let debounceTimer;
+
+            // Updated initialStages to handle attempts for exams
+            const initialStages = [
+                { id: 'requerimento', title: 'Formalização do Requerimento', status: 'pendente', date: '', notes: 'Início do processo no DETRAN ou canais digitais.', icon: 'M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z', cost: '' },
+                { id: 'cursoTeorico', title: 'Curso Teórico', status: 'pendente', date: '', notes: 'Aulas sobre legislação, direção defensiva, etc.', icon: 'M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25', cost: '' },
+                { id: 'biometria', title: 'Coleta Biométrica', status: 'pendente', date: '', notes: 'Coleta de foto, assinatura e digitais.', icon: 'M7.864 4.243A7.5 7.5 0 0119.5 10.5c0 2.92-.556 5.709-1.588 8.261a7.5 7.5 0 01-14.124 0c-1.032-2.552-1.588-5.34-1.588-8.261a7.5 7.5 0 013.75-6.486', cost: '' },
+                { id: 'examesMedicos', title: 'Exames de Aptidão Física e Mental', status: 'pendente', date: '', notes: 'Avaliação médica e psicológica.', icon: 'M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-9.75 0h9.75', cost: '' },
+                { id: 'exameTeorico', title: 'Exame Teórico', status: 'pendente', attempts: [], notes: 'Prova oficial do DETRAN.', icon: 'M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z' }, // Changed to attempts array
+                { id: 'divulgacaoPasseDePrimeira', title: 'Dica de Ouro: Passe de Primeira!', notes: 'Aprovado na teoria? Turbine sua preparação para o exame prático! Nosso treinamento exclusivo "Passe de Primeira" tem tudo o que você precisa para conquistar sua CNH sem medo.', url: 'https://autoescolaaline.com.br/curso/', buttonText: 'Conhecer o Treinamento', icon: 'M12 18v-5.25m0 0a6.01 6.01 0 001.5-.189m-1.5.189a6.01 6.01 0 01-1.5-.189m3.75 7.478a12.06 12.06 0 01-4.5 0m3.75 2.311a12.061 12.061 0 01-4.5 0m3.75 2.311a12.061 12.061 0 01-4.5 0m5.625-10.44a6 6 0 11-11.25 0 6 6 0 0111.25 0z'},
+                { id: 'aulasPraticas', title: 'Aulas Práticas de Direção', status: 'pendente', date: '', notes: 'Etapa opcional, mas recomendada. Defina a carga horária com seu instrutor.', icon: 'M9 15.75l3-3m0 0l3 3m-3-3v11.25m-10.125-11.25h14.25c.621 0 1.125.504 1.125 1.125v12c0 .621-.504 1.125-1.125 1.125H5.625c-.621 0-1.125-.504-1.125-1.125v-12c0-.621.504-1.125 1.125-1.125z', cost: '' },
+                { id: 'examePratico', title: 'Exame de Direção Veicular', status: 'pendente', attempts: [], notes: 'Prova prática de baliza e percurso.', icon: 'M21 12a2.25 2.25 0 00-2.25-2.25H15a3 3 0 11-6 0H5.25A2.25 2.25 0 003 12m18 0v6a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 18v-6m18 0a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 9.75m18 0v-6a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 1.5v6m12 15a3 3 0 11-6 0 3 3 0 016 0z' }, // Changed to attempts array
+                { id: 'permissao', title: 'Emissão da Permissão para Dirigir (PPD)', status: 'pendente', date: '', notes: 'Parabéns! Válida por 1 ano.', icon: 'M15 9h3.75M15 12h3.75M15 15h3.75M4.5 19.5h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z', cost: '' },
+                { id: 'cnhDefinitiva', title: 'CNH Definitiva', status: 'pendente', date: '', notes: 'Conquista final após 1 ano sem infrações graves/gravíssimas.', icon: 'M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z', cost: '' }
+            ];
+
+            // --- Authentication Logic ---
+            auth.onAuthStateChanged(async (user) => {
+                if (user) {
+                    currentUser = user;
+                    loginBanner.classList.add('hidden');
+                    userInfo.classList.remove('hidden');
+                    userInfo.classList.add('flex');
+                    footerSaveInfo.textContent = "Seu progresso é salvo na nuvem, associado à sua conta.";
+                    displayUserInfo(user);
+                    await migrateLocalDataToFirestore();
+                    await loadProgress();
+                } else {
+                    currentUser = null;
+                    loginBanner.classList.remove('hidden');
+                    userInfo.classList.add('hidden');
+                    footerSaveInfo.textContent = "Seus dados são salvos localmente no seu navegador.";
+                    loadProgress(); 
+                }
+            });
+
+            loginBtn.addEventListener('click', () => {
+                auth.signInWithPopup(googleProvider).catch(error => console.error("Erro no login:", error));
+            });
+
+            const displayUserInfo = (user) => {
+                userInfo.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <span class="text-sm font-semibold">${user.displayName}</span>
+                        <img src="${user.photoURL}" alt="Foto do usuário" class="w-8 h-8 rounded-full">
+                        <button id="logout-btn" class="text-sm text-red-600 hover:underline">Sair</button>
+                    </div>
+                `;
+                document.getElementById('logout-btn').addEventListener('click', () => auth.signOut());
+            };
+
+            // --- Data Logic ---
+            const loadProgress = async () => {
+                if (currentUser) {
+                    const docRef = db.collection('userProgress').doc(currentUser.uid);
+                    const doc = await docRef.get();
+                    if (doc.exists) {
+                       stagesData = doc.data().stages;
+                       // Ensure attempts is always an array for exam stages
+                       stagesData.forEach(stage => {
+                           if ((stage.id === 'exameTeorico' || stage.id === 'examePratico') && !Array.isArray(stage.attempts)) {
+                               stage.attempts = [];
+                           }
+                           if(stage.id !== 'exameTeorico' && stage.id !== 'examePratico' && stage.attempts) {
+                               delete stage.attempts; // Clean up old data if structure changed
+                           }
+                       });
+                    } else {
+                        stagesData = JSON.parse(JSON.stringify(initialStages));
+                    }
+                } else {
+                    const localData = localStorage.getItem('cnhProgress');
+                    if (localData) {
+                        stagesData = JSON.parse(localData);
+                        // Ensure attempts is always an array for exam stages locally too
+                        stagesData.forEach(stage => {
+                           if ((stage.id === 'exameTeorico' || stage.id === 'examePratico') && !Array.isArray(stage.attempts)) {
+                               stage.attempts = [];
+                           }
+                            if(stage.id !== 'exameTeorico' && stage.id !== 'examePratico' && stage.attempts) {
+                               delete stage.attempts; // Clean up old local data
+                           }
+                        });
+                    } else {
+                       stagesData = JSON.parse(JSON.stringify(initialStages));
+                    }
+                }
+                renderTimeline();
+            };
+            
+            const migrateLocalDataToFirestore = async () => {
+                const localDataRaw = localStorage.getItem('cnhProgress');
+                if (localDataRaw && currentUser) {
+                    try {
+                        let localData = JSON.parse(localDataRaw);
+                         // Ensure attempts is always an array before migrating
+                        localData.forEach(stage => {
+                           if ((stage.id === 'exameTeorico' || stage.id === 'examePratico') && !Array.isArray(stage.attempts)) {
+                               stage.attempts = [];
+                           }
+                            if(stage.id !== 'exameTeorico' && stage.id !== 'examePratico' && stage.attempts) {
+                               delete stage.attempts;
+                           }
+                        });
+                        await db.collection('userProgress').doc(currentUser.uid).set({ stages: localData });
+                        localStorage.removeItem('cnhProgress');
+                        showToast('Dados locais migrados para a nuvem!');
+                    } catch (error) {
+                        console.error("Erro ao migrar dados locais:", error);
+                    }
+                }
+            };
+
+            const debouncedSave = () => {
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(async () => {
+                    if (currentUser) {
+                        try {
+                            await db.collection('userProgress').doc(currentUser.uid).set({ stages: stagesData });
+                            showToast('Progresso salvo na nuvem!');
+                        } catch (error) {
+                            console.error("Erro ao salvar no Firestore: ", error);
+                            showToast('Erro ao salvar. Tente novamente.');
+                        }
+                    } else {
+                        localStorage.setItem('cnhProgress', JSON.stringify(stagesData));
+                        showToast('Progresso salvo localmente!');
+                    }
+                }, 1500);
+            };
+
+            // --- UI & Rendering Logic ---
+            const statusOptions = { default: [{ value: 'pendente', text: 'Pendente' }, { value: 'andamento', text: 'Em Andamento' },{ value: 'concluido', text: 'Concluído' }], exame: [{ value: 'pendente', text: 'Pendente' }, { value: 'aprovado', text: 'Aprovado' }, { value: 'reprovado', text: 'Reprovado' }], final: [{ value: 'pendente', text: 'Pendente' }, { value: 'emitido', text: 'Emitido' }] };
+            const showToast = (message) => { toast.innerHTML = `<p>${message}</p>`; toast.classList.remove('translate-x-full'); toast.classList.add('translate-x-0'); setTimeout(() => { toast.classList.remove('translate-x-0'); toast.classList.add('translate-x-full'); }, 3000); };
+            const updateCounters = () => {
+                const dates = stagesData
+                    .flatMap(stage => (stage.attempts ? stage.attempts.map(a => a.date) : [stage.date]))
+                    .filter(date => date);
+                if (dates.length === 0) {
+                    durationCounter.innerHTML = '<span>Insira uma data para começar a contagem!</span>';
+                } else {
+                     const firstDate = new Date(Math.min.apply(null, dates.map(dateStr => new Date(`${dateStr}T12:00:00Z`))));
+                    const today = new Date(); today.setUTCHours(12,0,0,0);
+                    if (firstDate > today) { durationCounter.innerHTML = '<span>Aguardando início...</span>'; }
+                    else {
+                        const diffTime = today - firstDate; const diffDays = Math.floor(diffTime / (1000*60*60*24));
+                        let durationText = (diffDays < 1) ? "Hoje" : (diffDays === 1) ? "1 dia" : (diffDays < 30) ? `${diffDays} dias` : (() => {
+                            const years = Math.floor(diffDays/365); const months = Math.floor((diffDays % 365) / 30.44);
+                            let parts = [];
+                            if (years > 0) parts.push(`${years} ${years === 1 ? 'ano':'anos'}`);
+                            if (months > 0) parts.push(`${months} ${months === 1 ? 'mês':'meses'}`);
+                            return parts.length > 0 ? parts.join(' e ') : `1 mês`;
+                        })();
+                        durationCounter.innerHTML = `<span>Tempo de processo: <strong>${durationText}</strong></span>`;
+                    }
+                }
+
+                 const totalCost = stagesData.reduce((total, stage) => {
+                    let stageCost = 0;
+                    if (stage.attempts && Array.isArray(stage.attempts)) {
+                        stageCost = stage.attempts.reduce((attemptTotal, attempt) => attemptTotal + (isNaN(parseFloat(attempt.cost)) ? 0 : parseFloat(attempt.cost)), 0);
+                    } else if (stage.cost) {
+                        stageCost = isNaN(parseFloat(stage.cost)) ? 0 : parseFloat(stage.cost);
+                    }
+                    return total + stageCost;
+                }, 0);
+                totalCostCounter.innerHTML = `<span>Custo Total: <strong>${totalCost.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong></span>`;
+            };
+
+            const renderTimeline = () => {
+                timelineContainer.innerHTML = '<div class="timeline-road"></div>';
+                stagesData.forEach((stage, index) => {
+                    const timelineItem = document.createElement('div');
+                    timelineItem.className = 'timeline-item mb-8 w-full flex flex-col items-center';
+
+                    const iconHTML = `<div class="z-20 flex-shrink-0 flex items-center shadow-lg w-10 h-10 rounded-full"><svg class="w-6 h-6 text-white mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${stage.icon}"></path></svg></div>`;
+                    let cardHTML;
+                    let iconContainerHTML;
+                    
+                    if (stage.id === 'divulgacaoPasseDePrimeira') {
+                        cardHTML = `<div class="bg-amber-50 rounded-lg shadow-xl p-4 md:p-6 border-2 border-amber-400"><h3 class="font-bold text-amber-800 text-xl mb-2">${stage.title}</h3><p class="text-gray-700 mb-4">${stage.notes}</p><a href="${stage.url}" target="_blank" class="block text-center w-full bg-emerald-500 text-white font-bold py-3 px-4 rounded-lg hover:bg-emerald-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1">${stage.buttonText}</a></div>`;
+                        iconContainerHTML = `<div class="z-20 flex-shrink-0 flex items-center bg-amber-500 shadow-lg w-10 h-10 rounded-full">${iconHTML}</div>`;
+                        timelineItem.innerHTML = `<div class="relative w-full flex flex-col items-center">${iconContainerHTML}<div class="w-full max-w-sm -mt-5 pt-8 relative z-10">${cardHTML}</div></div>`;
+                    } else {
+                        const statusConfig = {pendente:{cardBg:'bg-gray-50',border:'border-gray-200',iconBg:'bg-gray-400'},andamento:{cardBg:'bg-blue-50',border:'border-blue-200',iconBg:'bg-logo-blue'},concluido:{cardBg:'bg-emerald-50',border:'border-emerald-200',iconBg:'bg-emerald-500'},aprovado:{cardBg:'bg-emerald-50',border:'border-emerald-200',iconBg:'bg-emerald-500'},reprovado:{cardBg:'bg-red-50',border:'border-red-200',iconBg:'bg-red-500'},emitido:{cardBg:'bg-emerald-50',border:'border-emerald-200',iconBg:'bg-emerald-500'}};
+                        const currentStatus = statusConfig[stage.status] || statusConfig.pendente;
+                        let currentStatusOptions = statusOptions.default;
+                        
+                        let attemptsHTML = '';
+                        let dateCostInputsHTML = '';
+
+                        // Check if it's an exam stage
+                        if (stage.id === 'exameTeorico' || stage.id === 'examePratico') {
+                             currentStatusOptions = statusOptions.exame;
+                             // Ensure attempts is an array
+                             stage.attempts = Array.isArray(stage.attempts) ? stage.attempts : []; 
+
+                             attemptsHTML = `
+                                <div class="mt-4">
+                                    <h4 class="text-sm font-semibold text-gray-700 mb-2">Histórico de Tentativas:</h4>
+                                    <div id="attempts-list-${stage.id}" class="text-sm text-gray-600 space-y-1 mb-3">
+                                        ${stage.attempts.length === 0 ? '<p>Nenhuma tentativa registrada.</p>' : ''}
+                                        ${stage.attempts.map((attempt, idx) => `
+                                            <div class="attempt-item" data-stage-id="${stage.id}" data-attempt-index="${idx}">
+                                                <span>${new Date(attempt.date + 'T12:00:00Z').toLocaleDateString('pt-BR')} - ${parseFloat(attempt.cost || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span>
+                                                <button class="remove-attempt-btn text-red-500 hover:text-red-700 text-xs ml-2" title="Remover tentativa">✖</button>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                    <button class="add-attempt-btn text-sm text-blue-600 hover:text-blue-800 font-semibold" data-stage-id="${stage.id}">+ Adicionar Tentativa</button>
+                                </div>
+                             `;
+                        } else {
+                            // Standard date and cost inputs for non-exam stages
+                            currentStatusOptions = (stage.id === 'permissao' || stage.id === 'cnhDefinitiva') ? statusOptions.final : statusOptions.default;
+                            dateCostInputsHTML = `
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label for="date-${stage.id}" class="block text-sm font-semibold text-gray-600 mb-1">Data</label>
+                                        <input type="date" id="date-${stage.id}" data-stage-id="${stage.id}" data-prop="date" value="${stage.date || ''}" class="autosave w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-logo-blue focus:border-logo-blue">
+                                    </div>
+                                    <div>
+                                        <label for="cost-${stage.id}" class="block text-sm font-semibold text-gray-600 mb-1">Valor Gasto</label>
+                                        <input type="number" id="cost-${stage.id}" data-stage-id="${stage.id}" data-prop="cost" value="${stage.cost || ''}" placeholder="R$ 0,00" class="autosave w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-logo-blue focus:border-logo-blue">
+                                    </div>
+                                </div>`;
+                        }
+                        
+                        const optionsHtml = currentStatusOptions.map(opt => `<option value="${opt.value}" ${stage.status === opt.value ? 'selected' : ''}>${opt.text}</option>`).join('');
+                        
+                        cardHTML = `<div class="${currentStatus.cardBg} rounded-lg shadow-md p-4 md:p-6 border ${currentStatus.border}"><h3 class="font-bold text-gray-800 text-lg mb-3">${stage.title}</h3><div class="space-y-4">${dateCostInputsHTML}<div><label for="status-${stage.id}" class="block text-sm font-semibold text-gray-600 mb-1">Status Geral</label><select id="status-${stage.id}" data-stage-id="${stage.id}" data-prop="status" class="autosave w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-logo-blue focus:border-logo-blue">${optionsHtml}</select></div>${attemptsHTML}<div><label for="notes-${stage.id}" class="block text-sm font-semibold text-gray-600 mb-1">Anotações</label><textarea id="notes-${stage.id}" data-stage-id="${stage.id}" data-prop="notes" rows="2" class="autosave w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-logo-blue focus:border-logo-blue" placeholder="Ex: Informações adicionais...">${stage.notes}</textarea></div></div></div>`;
+
+                        iconContainerHTML = `<div class="z-20 flex-shrink-0 flex items-center ${currentStatus.iconBg} shadow-lg w-10 h-10 rounded-full">${iconHTML}</div>`;
+                        
+                        timelineItem.innerHTML = `
+                            <div class="relative w-full flex flex-col items-center">
+                                ${iconContainerHTML}
+                                <div class="w-full max-w-sm -mt-5 pt-8 relative z-10">
+                                    ${cardHTML}
+                                </div>
+                            </div>
+                        `;
+                    }
+                    timelineContainer.appendChild(timelineItem);
+                });
+
+                // --- Event Listeners ---
+                document.querySelectorAll('.autosave').forEach(input => {
+                    input.addEventListener('input', handleAutoSave);
+                });
+
+                 document.querySelectorAll('.add-attempt-btn').forEach(button => {
+                    button.addEventListener('click', handleAddAttempt);
+                });
+                
+                document.querySelectorAll('.remove-attempt-btn').forEach(button => {
+                   button.addEventListener('click', handleRemoveAttempt);
+                });
+                
+                updateCounters();
+            };
+
+            function handleAutoSave(e) {
+                const stageId = e.target.dataset.stageId;
+                const prop = e.target.dataset.prop;
+                const stageIndex = stagesData.findIndex(s => s.id === stageId);
+                if (stageIndex !== -1) {
+                    // Don't autosave attempts directly here
+                    if (prop !== 'attempts') {
+                       stagesData[stageIndex][prop] = e.target.value;
+                    }
+                    updateCounters();
+                    if (prop === 'status') {
+                        // Re-render only if status changed to update colors/options
+                        renderTimeline(); 
+                    }
+                    debouncedSave();
+                }
+            }
+
+            function handleAddAttempt(e) {
+                 const stageId = e.target.dataset.stageId;
+                 const stageIndex = stagesData.findIndex(s => s.id === stageId);
+                 if (stageIndex === -1) return;
+
+                 // Simple prompt for date and cost
+                 const date = prompt("Digite a data da tentativa (AAAA-MM-DD):");
+                 const cost = prompt("Digite o custo desta tentativa (apenas números):");
+
+                 if (date && cost && !isNaN(parseFloat(cost))) {
+                     // Ensure attempts array exists
+                    if (!Array.isArray(stagesData[stageIndex].attempts)) {
+                        stagesData[stageIndex].attempts = [];
+                    }
+                     stagesData[stageIndex].attempts.push({ date: date, cost: parseFloat(cost) });
+                     debouncedSave();
+                     renderTimeline(); // Re-render to show the new attempt
+                 } else if (date || cost) {
+                     alert("Data ou custo inválido. Por favor, tente novamente.");
+                 }
+            }
+            
+             function handleRemoveAttempt(e) {
+                const button = e.target;
+                const attemptItem = button.closest('.attempt-item');
+                const stageId = attemptItem.dataset.stageId;
+                const attemptIndex = parseInt(attemptItem.dataset.attemptIndex, 10);
+                 const stageIndex = stagesData.findIndex(s => s.id === stageId);
+
+                if (stageIndex !== -1 && stagesData[stageIndex].attempts && stagesData[stageIndex].attempts[attemptIndex]) {
+                     if (confirm(`Remover tentativa de ${new Date(stagesData[stageIndex].attempts[attemptIndex].date + 'T12:00:00Z').toLocaleDateString('pt-BR')}?`)) {
+                        stagesData[stageIndex].attempts.splice(attemptIndex, 1);
+                        debouncedSave();
+                        renderTimeline();
+                    }
+                }
+            }
+
+
+            shareBtn.addEventListener('click', async () => {
+                const shareData = { title: 'MINHA CNH', text: 'Estou acompanhando meu processo para tirar a CNH com o app MINHA CNH! Acompanhe o seu também.', url: window.location.href };
+                try {
+                    if (navigator.share) await navigator.share(shareData);
+                    else {
+                        navigator.clipboard.writeText(shareData.url);
+                        showToast('Link copiado para a área de transferência!');
+                    }
+                } catch (err) {
+                    console.error("Erro ao compartilhar: ", err);
+                    navigator.clipboard.writeText(shareData.url);
+                    showToast('Link copiado para a área de transferência!');
+                }
+            });
+            
+            auth.onAuthStateChanged(user => {});
+        });
+    </script>
+
+</body>
+</html>
+
