@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HABILITA CFC - Sistema de Gerenciamento para Autoescolas</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* --- Reset e Estilos Globais --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            color: #5a6376; /* Cor de texto padrão (cinza) */
+            line-height: 1.7;
+            background-color: #ffffff;
+        }
+
+        .container {
+            max-width: 1140px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        section {
+            padding: 80px 0;
+        }
+
+        h1, h2, h3 {
+            color: #2d3748; /* Cor de título (azul escuro) */
+            font-weight: 700;
+        }
+
+        h1 {
+            font-size: 48px;
+            line-height: 1.2;
+        }
+
+        h2 {
+            font-size: 36px;
+            line-height: 1.3;
+        }
+
+        h3 {
+            font-size: 20px;
+        }
+
+        /* --- Estilos dos Botões (Baseado no design) --- */
+        .btn {
+            display: inline-block;
+            padding: 12px 28px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background-color: #6754e2; /* Roxo do botão "Contact Us" */
+            color: #ffffff;
+            box-shadow: 0 4px 15px rgba(103, 84, 226, 0.3);
+        }
+
+        .btn-primary:hover {
+            background-color: #5645b9;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            color: #4e91ff; /* Azul do botão "Learn More" */
+            font-weight: 600;
+            background: transparent;
+        }
+
+        .btn-secondary:hover {
+            color: #3a7de0;
+        }
+
+        /* --- Cabeçalho (Header) --- */
+        .header {
+            padding: 20px 0;
+            background-color: #fff;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .header .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: #2d3748;
+            text-decoration: none;
+        }
+
+        .nav-menu a {
+            margin-left: 25px;
+            text-decoration: none;
+            color: #5a6376;
+            font-weight: 500;
+        }
+
+        .nav-menu a.btn-primary {
+            margin-left: 25px;
+            color: #fff; /* Garante que o texto do botão seja branco */
+        }
+
+        /* --- Seção 1: Título e Headline (Hero) --- */
+        #inicio {
+            padding: 100px 0;
+            text-align: center;
+        }
+
+        #inicio h1 {
+            max-width: 700px;
+            margin: 0 auto 20px;
+        }
+
+        #inicio .sub-headline {
+            font-size: 18px;
+            max-width: 600px;
+            margin: 0 auto 30px;
+            color: #5a6376;
+        }
+
+        .hero-buttons .btn {
+            margin: 0 10px;
+        }
+
+        /* --- Seção 2: Funcionalidades --- */
+        #funcionalidades {
+            background-color: #f9faff; /* Fundo levemente azulado/cinza */
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .section-title h2 {
+            margin-bottom: 15px;
+        }
+
+        .section-title p {
+            max-width: 500px;
+            margin: 0 auto;
+            font-size: 16px;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+        }
+
+        .feature-card {
+            background-color: #ffffff;
+            padding: 35px;
+            border-radius: 8px;
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        }
+
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 25px;
+        }
+        
+        .feature-icon svg {
+            width: 30px;
+            height: 30px;
+            stroke-width: 2;
+        }
+
+        /* Ícone 1: Gerenciamento de Alunos (Analytics) */
+        .icon-1 {
+            background-color: rgba(22, 211, 154, 0.1); /* Fundo verde claro */
+        }
+        .icon-1 svg {
+            stroke: #16d39a; /* Cor verde */
+        }
+
+        /* Ícone 2: Gerenciamento Financeiro (Digital Marketing) */
+        .icon-2 {
+            background-color: rgba(78, 145, 255, 0.1); /* Fundo azul claro */
+        }
+        .icon-2 svg {
+            stroke: #4e91ff; /* Cor azul */
+        }
+
+        /* Ícone 3: Gerenciamento de Etapas (Email Marketing) */
+        .icon-3 {
+            background-color: rgba(255, 183, 3, 0.1); /* Fundo amarelo claro */
+        }
+        .icon-3 svg {
+            stroke: #ffb703; /* Cor amarela */
+        }
+        
+        .feature-card h3 {
+            margin-bottom: 10px;
+        }
+
+        .feature-card p {
+            font-size: 15px;
+            color: #5a6376;
+        }
+        
+        .feature-link {
+            display: inline-block;
+            margin-top: 15px;
+            color: #6754e2;
+            text-decoration: none;
+            font-weight: 600;
+            transition: transform 0.2s ease;
+        }
+
+        .feature-link:hover {
+            transform: translateX(5px);
+        }
+
+
+        /* --- Seção 3: Assinatura (Pricing) --- */
+        #assinatura {
+            text-align: center;
+        }
+
+        .pricing-card {
+            max-width: 450px;
+            margin: 0 auto;
+            padding: 40px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+            border: 2px solid #6754e2; /* Destaque roxo */
+        }
+
+        .pricing-card h2 {
+            margin-bottom: 10px;
+        }
+
+        .pricing-card .price {
+            font-size: 52px;
+            font-weight: 700;
+            color: #6754e2;
+            margin: 20px 0;
+        }
+
+        .pricing-card .price span {
+            font-size: 18px;
+            font-weight: 400;
+            color: #5a6376;
+        }
+
+        .pricing-card p {
+            margin-bottom: 30px;
+            font-size: 16px;
+        }
+
+        .btn-assinatura {
+            width: 100%;
+            font-size: 18px;
+            padding: 15px 30px;
+        }
+
+        /* --- Rodapé --- */
+        .footer {
+            text-align: center;
+            padding: 30px 0;
+            background-color: #f9faff;
+            color: #999;
+            font-size: 14px;
+            border-top: 1px solid #f0f0f0;
+        }
+
+
+        /* --- Responsividade (Mobile) --- */
+        @media (max-width: 992px) {
+            .features-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 36px; }
+            h2 { font-size: 30px; }
+
+            .nav-menu {
+                display: none; /* Simplificação para mobile, ou precisaria de JS para um menu hamburguer */
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr; /* Coluna única em telas menores */
+            }
+
+            .pricing-card {
+                padding: 30px;
+            }
+        }
+
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <div class="container">
+            <a href="#inicio" class="logo">HABILITA CFC</a>
+            <nav class="nav-menu">
+                <a href="#inicio">Início</a>
+                <a href="#funcionalidades">Funcionalidades</a>
+                <a href="#assinatura" class="btn btn-primary">Assine Agora</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+
+        <section id="inicio">
+            <div class="container">
+                <h1>O Sistema Completo para Gerenciamento de Autoescolas</h1>
+                <p class="sub-headline">
+                    Modernize seu CFC. Automatize processos, gerencie alunos e finanças,
+                    e impulsione seu crescimento com o HABILITA CFC.
+                </p>
+                <div class="hero-buttons">
+                    <a href="#assinatura" class="btn btn-primary">Comece Agora</a>
+                    <a href="#funcionalidades" class="btn btn-secondary">Ver Funcionalidades</a>
+                </div>
+            </div>
+        </section>
+
+        <section id="funcionalidades">
+            <div class="container">
+                <div class="section-title">
+                    <h2>Como funciona?</h2>
+                    <p>Tudo o que você precisa para gerenciar seu CFC de forma eficiente e inteligente, na palma da sua mão.</p>
+                </div>
+
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon icon-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+                        </div>
+                        <h3>Gerenciamento de Alunos</h3>
+                        <p>Relatórios inteligentes que respondem qual é o perfil do seus clientes, gerados por inteligência artificial.</p>
+                        <a href="#" class="feature-link">Saiba Mais &rarr;</a>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon icon-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+                        </div>
+                        <h3>Gerenciamento Financeiro</h3>
+                        <p>Previsão de caixa, despesas com veículos, lembretes de manutenção e relatório de peças trocadas.</p>
+                        <a href="#" class="feature-link">Saiba Mais &rarr;</a>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon icon-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>
+                        </div>
+                        <h3>Gerenciamento de Etapas</h3>
+                        <p>Análise de IA para reduzir o tempo do processo, alertas de prazos e visão completa de quantos alunos estão em cada etapa.</p>
+                        <a href="#" class="feature-link">Saiba Mais &rarr;</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="assinatura">
+            <div class="container">
+                <div class="pricing-card">
+                    <h2>Comece a usar agora!</h2>
+                    <p>Tenha acesso ilimitado a todas as funcionalidades e modernize sua autoescola hoje mesmo.</p>
+                    <div class="price">
+                        R$ 50,00 <span>/ por mês</span>
+                    </div>
+                    <a href="#" class="btn btn-primary btn-assinatura">Assinar Agora</a>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 HABILITA CFC. Todos os direitos reservados.</p>
+        </div>
+    </footer>
+
+</body>
+</html>
