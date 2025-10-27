@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Habilita CFC</title>
+
+    <!-- Fonte Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-color: #6754e2;
+            --primary-hover: #5645b9;
+            --text-dark: #2d3748;
+            --text-light: #5a6376;
+            --bg-light: #f9faff;
+            --border-color: #e2e8f0;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-light);
+            margin: 0;
+            color: var(--text-light);
+        }
+        body.loading {
+            display: none; /* Esconde conteúdo até verificar login */
+        }
+        .header {
+            background-color: #fff;
+            padding: 20px 40px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+        .user-info {
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+        }
+        .user-info span {
+            font-weight: 600;
+            margin-right: 15px;
+        }
+        #logout-button {
+            background: transparent;
+            border: 1px solid #d9534f;
+            color: #d9534f;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 14px;
+            padding: 5px 10px;
+            border-radius: 5px;
+            transition: all 0.2s ease;
+        }
+        #logout-button:hover {
+            background-color: #d9534f;
+            color: #fff;
+        }
+        .container {
+            max-width: 1140px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: #ffffff;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            box-shadow: 0 4px 15px rgba(103, 84, 226, 0.2);
+        }
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-2px);
+        }
+
+        /* Lista de Alunos */
+        #lista-alunos {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .aluno-card {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border-color);
+            transition: all 0.2s ease;
+            cursor: pointer; /* Adicionado cursor pointer */
+        }
+        .aluno-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+        }
+        .aluno-card h3 {
+            color: var(--text-dark);
+            margin: 0 0 10px 0;
+        }
+        .aluno-card p {
+            margin: 0 0 5px 0;
+            font-size: 14px;
+        }
+        .aluno-card .servico-badge {
+            display: inline-block;
+            background-color: #eef;
+            color: var(--primary-color);
+            padding: 3px 8px;
+            border-radius: 5px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            display: none; /* Escondido por padrão */
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px);
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: auto;
+            padding: 0;
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            width: 90%;
+            max-width: 700px;
+            animation: slide-down 0.3s ease-out;
+        }
+        @keyframes slide-down {
+            from { transform: translateY(-30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .modal-header {
+            padding: 15px 25px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .modal-header h2 {
+            margin: 0;
+            color: var(--text-dark);
+        }
+        .close-button {
+            color: var(--text-light);
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .close-button:hover { color: #d9534f; }
+        
+        .modal-body {
+            padding: 25px;
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+        .form-group label {
+            font-weight: 600;
+            margin-bottom: 5px;
+            font-size: 14px;
+            color: var(--text-dark);
+        }
+        .form-group input,
+        .form-group select {
+            padding: 10px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 15px;
+            transition: all 0.2s ease;
+        }
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(103, 84, 226, 0.2);
+        }
+
+        .modal-footer {
+            padding: 15px 25px;
+            border-top: 1px solid var(--border-color);
+            text-align: right;
+        }
+
+    </style>
+</head>
+<body class="loading"> <!-- Começa escondido -->
+
+    <header class="header">
+        <div class="logo">HABILITA CFC</div>
+        <div class="user-info">
+            <span id="user-display-name">Carregando...</span>
+            <button id="logout-button">Sair</button>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="dashboard-header">
+            <h1>Alunos</h1>
+            <button id="btn-novo-aluno" class="btn-primary">Cadastrar Novo Aluno</button>
+        </div>
+
+        <div id="lista-alunos">
+            <p>Nenhum aluno cadastrado ainda...</p>
+        </div>
+    </main>
+
+    <!-- Modal de Cadastro de Aluno -->
+    <div id="modal-aluno" class="modal-overlay">
+        <div class="modal-content">
+            <form id="form-aluno">
+                <div class="modal-header">
+                    <h2>Cadastrar Novo Aluno</h2>
+                    <span class="close-button">&times;</span>
+                </div>
+                <div class="modal-body">
+                    <div class="form-grid">
+                        <div class="form-group full-width">
+                            <label for="nome">Nome Completo</label>
+                            <input type="text" id="nome" name="nome" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="cpf">CPF</label>
+                            <input type="text" id="cpf" name="cpf">
+                        </div>
+                        <div class="form-group">
+                            <label for="rg">RG</label>
+                            <input type="text" id="rg" name="rg">
+                        </div>
+                        <div class="form-group">
+                            <label for="data_nascimento">Data de Nascimento</label>
+                            <input type="date" id="data_nascimento" name="data_nascimento">
+                        </div>
+                         <div class="form-group">
+                            <label for="telefone">Telefone (com DDD)</label>
+                            <input type="tel" id="telefone" name="telefone" placeholder="11999998888">
+                        </div>
+                        <div class="form-group full-width">
+                            <label for="email">Email</label>
+                            <input type="email" id="email" name="email">
+                        </div>
+                        <div class="form-group full-width">
+                            <label for="endereco">Endereço</label>
+                            <input type="text" id="endereco" name="endereco" placeholder="Rua, Número, Bairro, Cidade - Estado">
+                        </div>
+                        <div class="form-group">
+                            <label for="servico">Serviço Contratado</label>
+                            <select id="servico" name="servico" required>
+                                <option value="">Selecione...</option>
+                                <option value="AB">AB (Carro e Moto)</option>
+                                <option value="A">A (Moto)</option>
+                                <option value="B">B (Carro)</option>
+                                <option value="Adição A">Adição A</option>
+                                <option value="Adição B">Adição B</option>
+                                <option value="Adição C">Adição C</option>
+                                <option value="Adição D">Adição D</option>
+                                <option value="Adição E">Adição E</option>
+                                <option value="Reabilitação">Reabilitação</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="valor_pago">Valor Pago (R$)</label>
+                            <input type="number" step="0.01" id="valor_pago" name="valor_pago">
+                        </div>
+                         <div class="form-group">
+                            <label for="renach">RENACH</label>
+                            <input type="text" id="renach" name="renach">
+                        </div>
+                        <div class="form-group">
+                            <label for="data_exame_medico">Data Exame Médico</label>
+                            <input type="date" id="data_exame_medico" name="data_exame_medico">
+                        </div>
+                        <div class="form-group">
+                            <label for="data_exame_psicotecnico">Data Exame Psicotécnico</label>
+                            <input type="date" id="data_exame_psicotecnico" name="data_exame_psicotecnico">
+                        </div>
+                        <div class="form-group">
+                            <label for="data_teorico_inicio">Início Curso Teórico</label>
+                            <input type="date" id="data_teorico_inicio" name="data_teorico_inicio">
+                        </div>
+                        <div class="form-group">
+                            <label for="data_teorico_fim">Fim Curso Teórico</label>
+                            <input type="date" id="data_teorico_fim" name="data_teorico_fim">
+                        </div>
+                         <div class="form-group">
+                            <label for="data_exame_teorico">Data Exame Teórico</label>
+                            <input type="date" id="data_exame_teorico" name="data_exame_teorico">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn-primary">Salvar Aluno</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <!-- SDKs do Firebase (Sintaxe de Módulo ES) -->
+    <script type="module">
+        // Importa as funções necessárias dos SDKs
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        // IMPORTAÇÕES DO FIRESTORE
+        import { 
+            getFirestore, 
+            collection, 
+            addDoc, 
+            query, 
+            onSnapshot 
+        } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+        // Sua configuração do Firebase (IDÊNTICA à do index.html)
+        const firebaseConfig = {
+            apiKey: "AIzaSyBl4xyH36EE4gX9mNUazHDxmDPkt-foVuI",
+            authDomain: "habilita-cfc.firebaseapp.com",
+            // Corrigindo o provável erro de digitação de 'cfs' para 'cfc'
+            projectId: "habilita-cfc", 
+            storageBucket: "habilita-cfc.firebasestorage.app",
+            messagingSenderId: "695924938189",
+            appId: "1:695924938189:web:befcb3ff6888ccf677a084",
+            measurementId: "G-XRQNJ8SWQY"
+        };
+
+        // Inicializa o Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app); // Inicializa o Firestore
+        
+        const userNameSpan = document.getElementById('user-display-name');
+        const logoutButton = document.getElementById('logout-button');
+
+        let currentUserId = null; // Variável global para guardar o ID do usuário logado
+
+        // Monitora o estado da autenticação
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // --- USUÁRIO ESTÁ LOGADO ---
+                currentUserId = user.uid; // Guarda o UID
+                console.log('Acesso permitido para:', user.displayName, 'UID:', currentUserId);
+                
+                userNameSpan.textContent = user.displayName || user.email;
+                document.body.classList.remove('loading');
+
+                // *** NOVA FUNÇÃO ***
+                // Começa a ouvir as mudanças no banco de dados DESTE usuário
+                loadAlunos(currentUserId);
+
+            } else {
+                // --- USUÁRIO NÃO ESTÁ LOGADO ---
+                currentUserId = null;
+                console.log('Acesso negado. Redirecionando para login...');
+                window.location.href = 'index.html';
+            }
+        });
+
+        // --- LÓGICA DE LOGOUT ---
+        logoutButton.addEventListener('click', () => {
+            signOut(auth);
+            // onAuthStateChanged vai pegar a mudança e redirecionar
+        });
+
+        // --- LÓGICA DO MODAL DE CADASTRO ---
+        const modal = document.getElementById('modal-aluno');
+        const btnNovoAluno = document.getElementById('btn-novo-aluno');
+        const closeButton = document.querySelector('.close-button');
+        const formAluno = document.getElementById('form-aluno');
+
+        btnNovoAluno.onclick = () => {
+            formAluno.reset(); // Limpa o formulário
+            modal.style.display = 'flex';
+        }
+        closeButton.onclick = () => {
+            modal.style.display = 'none';
+        }
+        window.onclick = (event) => {
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        }
+
+        // --- LÓGICA DO FIRESTORE (SALVAR ALUNO) ---
+        formAluno.addEventListener('submit', async (e) => {
+            e.preventDefault(); // Impede o recarregamento da página
+
+            if (!currentUserId) {
+                console.error("Erro: Usuário não está logado para salvar.");
+                return;
+            }
+
+            // Pega os dados do formulário
+            const formData = new FormData(formAluno);
+            const dataToSave = Object.fromEntries(formData.entries());
+
+            // Adiciona campos que você vai precisar (as listas)
+            dataToSave.reprovas_teorico = [];
+            dataToSave.aulas_praticas = [];
+            dataToSave.exames_praticos = [];
+            dataToSave.createdAt = new Date(); // Data de cadastro
+
+            try {
+                // Caminho de salvamento: /cfcs/{UID_DO_USUARIO}/alunos/{ID_DO_ALUNO}
+                const collectionRef = collection(db, 'cfcs', currentUserId, 'alunos');
+                const docRef = await addDoc(collectionRef, dataToSave);
+                
+                console.log("Aluno salvo com ID: ", docRef.id);
+                modal.style.display = 'none'; // Fecha o modal
+                formAluno.reset(); // Limpa o formulário
+            
+            } catch (error) {
+                console.error("Erro ao salvar aluno: ", error);
+                // Aqui você pode e_xibir uma mensagem de erro para o usuário
+            }
+        });
+
+        // --- LÓGICA DO FIRESTORE (CARREGAR ALUNOS EM TEMPO REAL) ---
+        function loadAlunos(userId) {
+            const listaAlunosDiv = document.getElementById('lista-alunos');
+            
+            // Cria a query para buscar alunos APENAS do usuário logado
+            const q = query(collection(db, 'cfcs', userId, 'alunos'));
+
+            // onSnapshot ouve em tempo real
+            onSnapshot(q, (snapshot) => {
+                if (snapshot.empty) {
+                    listaAlunosDiv.innerHTML = '<p>Nenhum aluno cadastrado ainda...</p>';
+                    return;
+                }
+
+                listaAlunosDiv.innerHTML = ''; // Limpa a lista
+                snapshot.forEach((doc) => {
+                    const aluno = doc.data();
+                    const alunoId = doc.id; // Pega o ID do documento
+
+                    // Cria o card do aluno
+                    const card = document.createElement('div');
+                    card.className = 'aluno-card';
+                    card.setAttribute('data-id', alunoId); // Guarda o ID no elemento
+
+                    // Botões de WhatsApp e Maps (lógica de UI)
+                    let foneHtml = `<p>Telefone: ${aluno.telefone || 'Não cadastrado'}</p>`;
+                    if (aluno.telefone) {
+                        foneHtml += `<a href="https://wa.me/55${aluno.telefone.replace(/\D/g,'')}" target="_blank" style="font-size: 12px; text-decoration: none;">Abrir WhatsApp</a>`;
+                    }
+
+                    let enderecoHtml = `<p>Endereço: ${aluno.endereco || 'Não cadastrado'}</p>`;
+                    if (aluno.endereco) {
+                        enderecoHtml += `<a href="https://maps.google.com/?q=${encodeURIComponent(aluno.endereco)}" target="_blank" style="font-size: 12px; text-decoration: none;">Abrir no Maps</a>`;
+                    }
+                    
+                    card.innerHTML = `
+                        <h3>${aluno.nome}</h3>
+                        <p>CPF: ${aluno.cpf || 'Não cadastrado'}</p>
+                        ${foneHtml}
+                        ${enderecoHtml}
+                        <span class="servico-badge">${aluno.servico}</span>
+                    `;
+
+                    // *** CORREÇÃO APLICADA AQUI ***
+                    // Adiciona stopPropagation() aos links para não acionar o clique do card
+                    const links = card.querySelectorAll('a');
+                    links.forEach(link => {
+                        link.addEventListener('click', (e) => {
+                            e.stopPropagation(); // Impede que o clique "borbulhe" para o card
+                        });
+                    });
+
+                    // Adiciona um clique no card para abrir os detalhes
+                    card.addEventListener('click', () => {
+                        window.location.href = `aluno-detalhes.html?id=${alunoId}`;
+                        console.log('Clicou no aluno. ID:', alunoId);
+                    });
+
+                    listaAlunosDiv.appendChild(card);
+                });
+            });
+        }
+
+    </script>
+
+</body>
+</html>
+
